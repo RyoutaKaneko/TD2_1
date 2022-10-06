@@ -107,13 +107,13 @@ void GameScene::Update() {
 
 
 	{
-		if (input_->PushKey(DIK_R)) {
+		if (input_->PushKey(DIK_RIGHT)) {
 
 			if (KEyeSpeed < 0.0f) {
 				KEyeSpeed *= -1;
 			}
 		}
-		else if (input_->PushKey(DIK_T)) {
+		else if (input_->PushKey(DIK_LEFT)) {
 			if (KEyeSpeed > 0.0f) {
 				KEyeSpeed *= -1;
 			}
@@ -129,13 +129,6 @@ void GameScene::Update() {
 	}
 	//子の更新(子は子で初期化)
 	{
-		if (input_->PushKey(DIK_RIGHT)) {
-			viewProjection_.target.x += kCharacterSpeed;
-		}
-		else if (input_->PushKey(DIK_LEFT)) {
-			viewProjection_.target.x -= kCharacterSpeed;
-		}
-		viewProjection_.UpdateMatrix();
 
 		worldTransforms_[1].matWorld_ = Affin::matUnit();
 		worldTransforms_[1].matWorld_ = Affin::matWorld(worldTransforms_[1].translation_, worldTransforms_[1].rotation_, worldTransforms_[1].scale_);
@@ -165,8 +158,19 @@ void GameScene::Update() {
 		worldTransforms_[3].TransferMatrix();
 	}
 
+	if (input_->TriggerKey(DIK_SPACE))
+	{
+		//
+		Bullet* newbullet = new Bullet();
+		newbullet->Initialize(model_, viewProjection_.eye);
 
+		bullet_ = newbullet;
+	}
 
+	if (bullet_)
+	{
+		bullet_->Update();
+	}
 }
 
 void GameScene::Draw() {
@@ -199,6 +203,10 @@ void GameScene::Draw() {
 	model_->Draw(worldTransforms_[1], viewProjection_, textureHandle_);
 	model_->Draw(worldTransforms_[2], viewProjection_, textureHandle_);
 	model_->Draw(worldTransforms_[3], viewProjection_, textureHandle_);
+
+	if (bullet_) {
+		bullet_->Draw(viewProjection_);
+	}
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion

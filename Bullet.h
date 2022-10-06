@@ -6,6 +6,8 @@
 #include "ViewProjection.h"
 #include <cassert>
 
+#include "Affin.h"
+
 class Bullet
 {
 public:

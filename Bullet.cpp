@@ -4,10 +4,10 @@
 void Bullet::Initialize(Model* model, const Vector3& position)
 {
 	//NULLチェック
-	assert(model_);
+	assert(model);
 	model_ = model;
 
-	textureHandle_ = TextureManager::Load("mario.png");
+	textureHandle_ = TextureManager::Load("mario.jpg");
 
 	worldTransform_.Initialize();
 
@@ -16,14 +16,13 @@ void Bullet::Initialize(Model* model, const Vector3& position)
 
 void Bullet::Update()
 {
-
+	worldTransform_.matWorld_ = Affin::matTrans(worldTransform_.translation_);
 	//行列の再計算
 	worldTransform_.TransferMatrix();
 }
 
 void Bullet::Draw(const ViewProjection& viewProjection)
 {
-
 	//モデルの描画
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 }
