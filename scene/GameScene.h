@@ -74,4 +74,6 @@ class GameScene {
 
 	//弾
 	Bullet* bullet_ = nullptr;
+
+	float KEyeSpeed = 0.5f;
 };
