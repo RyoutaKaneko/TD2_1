@@ -9,6 +9,7 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include "DebugCamera.h"
 
 /// <summary>
 /// ゲームシーン
@@ -41,6 +42,8 @@ class GameScene {
 	/// </summary>
 	void Draw();
 
+	float Angle(float angle);
+
   private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -50,4 +53,18 @@ class GameScene {
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
+	/// 
+	/// 
+	uint32_t textureHandle_ = 0;
+
+	Sprite* sprite_ = nullptr;
+	Model* model_ = nullptr;
+
+	WorldTransform worldTransforms_[100];
+	ViewProjection viewProjection_;
+
+	DebugCamera* debugCamera_ = nullptr;
+
+	//カメラ上方向の角度
+	float viewAngle = 0.0f;
 };
