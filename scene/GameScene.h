@@ -11,6 +11,8 @@
 #include "WorldTransform.h"
 #include "DebugCamera.h"
 
+#include "Bullet.h"
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -42,6 +44,8 @@ class GameScene {
 	/// </summary>
 	void Draw();
 
+	void Attack();
+
 	float Angle(float angle);
 
   private: // メンバ変数
@@ -67,4 +71,7 @@ class GameScene {
 
 	//カメラ上方向の角度
 	float viewAngle = 0.0f;
+
+	//弾
+	Bullet* bullet_ = nullptr;
 };
