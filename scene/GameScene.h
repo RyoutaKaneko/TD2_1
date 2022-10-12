@@ -79,5 +79,12 @@ class GameScene {
 	Vector3 velo;
 	Vector3 ai;
 
-	float KEyeSpeed = 0.5f;
+	float KEyeSpeed = 0.1f;
+
+
+	// 3Dレティクル用ワールドトランスフォーム
+	WorldTransform worldTransform3DReticle_;
+	Vector3 ret3DPos;
+	Vector3 myPos;
+	Vector3 resultRet;
 };
