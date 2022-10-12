@@ -59,11 +59,11 @@ class GameScene {
 	/// </summary>
 	/// 
 	/// 
-	uint32_t textureHandle_ = 0;
+	uint32_t textureHandle_[10];
 
 	Sprite* sprite_ = nullptr;
 	Model* model_ = nullptr;
-
+	WorldTransform objHome_;
 	WorldTransform worldTransforms_[100];
 	ViewProjection viewProjection_;
 
@@ -74,6 +74,10 @@ class GameScene {
 
 	//弾
 	Bullet* bullet_ = nullptr;
+	Vector3 pos;
+	Vector3 moveBul;
+	Vector3 velo;
+	Vector3 ai;
 
 	float KEyeSpeed = 0.5f;
 };

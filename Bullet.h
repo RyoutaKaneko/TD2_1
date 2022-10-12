@@ -6,13 +6,15 @@
 #include "ViewProjection.h"
 #include <cassert>
 
+#include "Affin.h"
+
 class Bullet
 {
 public:
 
 	void Initialize(Model* model, const Vector3& position);
 
-	void Update();
+	void Update(Vector3 trans);
 
 	void Draw(const ViewProjection& viewProjection);
 
