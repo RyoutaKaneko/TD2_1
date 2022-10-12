@@ -42,7 +42,7 @@ void GameScene::Initialize() {
 	//ファイル名を指定してテクスチャを入れ込む
 	textureHandle_[0] = TextureManager::Load("mario.jpg");
 	textureHandle_[1] = TextureManager::Load("dog.png");
-	textureHandle_[2] = TextureManager::Load("Ibox.png");
+	textureHandle_[2] = TextureManager::Load("png.png");
 
 	//スプライトの生成
 	sprite_ = Sprite::Create(textureHandle_[0], {100,50});
@@ -54,11 +54,11 @@ void GameScene::Initialize() {
 	objHome_.translation_ = { 0,1,0 };
 	//ワールドトランスフォームの初期化
 	worldTransforms_[0].Initialize();
-	worldTransforms_[0].scale_ = { 3,3,3 };
-	worldTransforms_[0].translation_ = { 0,1,0};
+	worldTransforms_[0].scale_ = { 1,1,1 };
+	worldTransforms_[0].translation_ = { 0,0,0};
 
 	worldTransforms_[1].Initialize();
-	worldTransforms_[1].translation_ = { 0,15,15 };
+	worldTransforms_[1].translation_ = { 0,40,40 };
 	worldTransforms_[1].parent_ = &worldTransforms_[0];
 	worldTransforms_[2].Initialize();
 	worldTransforms_[2].translation_ = { 10,0,0 };	
@@ -66,12 +66,14 @@ void GameScene::Initialize() {
 	worldTransforms_[3].translation_ = { -10,0,0 };
 
 	worldTransforms_[4].Initialize();
-	worldTransforms_[4].translation_ = { 0,10,10 };
+	worldTransforms_[4].translation_ = { 0,-10,-10 };
 	worldTransforms_[4].parent_ = &worldTransforms_[1];
 
 	worldTransforms_[5].Initialize();
 	worldTransforms_[5].translation_ = { 0,-1,0 };
 	worldTransforms_[5].scale_ = { 150,0.1f,150  };
+
+	worldTransform3DReticle_.Initialize();
 
 	//ビュープロジェクションの初期化
 	viewProjection_.Initialize();
@@ -129,12 +131,12 @@ void GameScene::Update() {
 	{
 		if (input_->PushKey(DIK_RIGHT)) {
 
-			if (KEyeSpeed < 0.0f) {
+			if (KEyeSpeed > 0.0f) {
 				KEyeSpeed *= -1;
 			}
 		}
 		else if (input_->PushKey(DIK_LEFT)) {
-			if (KEyeSpeed > 0.0f) {
+			if (KEyeSpeed < 0.0f) {
 				KEyeSpeed *= -1;
 			}
 		}
@@ -197,15 +199,55 @@ void GameScene::Update() {
 		worldTransforms_[5].TransferMatrix();
 	}
 
+	//自機のワールド座標から3Dレティクルのワールド座標を計算
+	//自機から3Dレティクルへの距離
+	 float kDistancePlayerTo3DReticle = 15.0f;
+
+	if (input_->PushKey(DIK_DOWN)) {
+
+	
+			kDistancePlayerTo3DReticle = 20;
+		
+	}
+	else if (input_->PushKey(DIK_UP)) {
+		
+			kDistancePlayerTo3DReticle = 10;
+		
+	}
+
+	//自機から3Dレティクルへのオフセット(Z+向き)
+	Vector3 offset = { 0.0f, 0, 1.0f };
+	//自機のワールド行列の回転を反映
+	offset = Affin::VecMat(offset, worldTransforms_[1].matWorld_);
+	//ベクトルの長さを整える
+	//offset.normalize();
+	float len = sqrt(offset.x * offset.x + offset.y * offset.y + offset.z * offset.z);
+	if (len != 0) {
+		offset /= len;
+	}
+	offset *= kDistancePlayerTo3DReticle;
+	worldTransform3DReticle_.translation_ = offset;
+	worldTransform3DReticle_.matWorld_ = Affin::matTrans(worldTransform3DReticle_.translation_);
+	worldTransform3DReticle_.TransferMatrix();
+
+	DebugText::GetInstance()->SetPos(20, 260);
+	DebugText::GetInstance()->Printf(
+		"MouseObject:(%f,%f,%f)", worldTransform3DReticle_.translation_.x,
+		worldTransform3DReticle_.translation_.y, worldTransform3DReticle_.translation_.z);
+
 	if (input_->TriggerKey(DIK_SPACE))
 	{
-		//moveBul = { 0,frontVec.y,frontVec.z };
+		
 		moveBul = { frontVec.x ,-1,frontVec.z };
 		//
 		Bullet* newbullet = new Bullet();
-		//pos = { viewProjection_.eye.x,viewProjection_.eye.y, viewProjection_.eye.z};
+		
 		pos = Affin::GetWorldTrans(worldTransforms_[1].matWorld_);
-		//velo = Affin::VecMat(moveBul, worldTransforms_[1].matWorld_);
+		ret3DPos = Affin::GetWorldTrans(worldTransform3DReticle_.matWorld_);
+		myPos = Affin::GetWorldTrans(worldTransforms_[1].matWorld_);
+		velo = ret3DPos - myPos;
+		velo.normalize();
+		resultRet = velo*50;
 		newbullet->Initialize(model_, pos);
 
 		bullet_ = newbullet;
@@ -214,8 +256,9 @@ void GameScene::Update() {
 	if (bullet_)
 	{
 		
-		bullet_->Update(moveBul);
+		bullet_->Update(resultRet);
 	}
+
 }
 
 void GameScene::Draw() {
@@ -244,13 +287,15 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-	model_->Draw(objHome_, viewProjection_, textureHandle_[0]);
+	model_->Draw(objHome_, viewProjection_, textureHandle_[2]);
 	//model_->Draw(worldTransforms_[0], viewProjection_, textureHandle_[0]);
 	model_->Draw(worldTransforms_[1], viewProjection_, textureHandle_[0]);
-	model_->Draw(worldTransforms_[2], viewProjection_, textureHandle_[0]);
+	/*model_->Draw(worldTransforms_[2], viewProjection_, textureHandle_[0]);
 	model_->Draw(worldTransforms_[3], viewProjection_, textureHandle_[0]);
-	model_->Draw(worldTransforms_[4], viewProjection_, textureHandle_[0]);
+	model_->Draw(worldTransforms_[4], viewProjection_, textureHandle_[0]);*/
 	model_->Draw(worldTransforms_[5], viewProjection_, textureHandle_[1]);
+
+	model_->Draw(worldTransform3DReticle_, viewProjection_, textureHandle_[0]);
 
 	if (bullet_) {
 		bullet_->Draw(viewProjection_);
