@@ -11,12 +11,14 @@ void Bullet::Initialize(Model* model, const Vector3& position)
 
 	worldTransform_.Initialize();
 
-	worldTransform_.translation_ = position;
+	//worldTransform_.translation_ = position;
+	worldTransform_.matWorld_ = Affin::matTrans(position);
+	worldTransform_.TransferMatrix();
 }
 
-void Bullet::Update()
+void Bullet::Update(Vector3 trans)
 {
-	worldTransform_.matWorld_ = Affin::matTrans(worldTransform_.translation_);
+	worldTransform_.matWorld_ *= Affin::matTrans(trans);
 	//çsóÒÇÃçƒåvéZ
 	worldTransform_.TransferMatrix();
 }
